@@ -13,6 +13,8 @@ out vec4  shadowCoords;
 
 const float density = 0.001;
 const float gradient = 1.7; 
+const float shadowDistance = 150.0;
+const float transitionDistance  = 10.0;
 
 uniform mat4 transformationMatrix;
 uniform mat4 projectionMatrix;
@@ -41,4 +43,9 @@ void main(void){
 	float distance = length(positionRelativeToCam.xyz);
 	visibility = exp(-pow((distance*density), gradient));
 	visibility = clamp(visibility, 0.0, 1.0);
+	
+	distance = distance  - (shadowDistance - transitionDistance);
+	distance = distance  / transitionDistance;
+	shadowCoords.w = clamp(1.0-distance, 0.0, 1.0);
+	
 }
