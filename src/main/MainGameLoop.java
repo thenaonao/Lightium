@@ -50,7 +50,13 @@ public class MainGameLoop {
         int number = 0;
         DisplayManager.createDisplay();
         Loader loader = new Loader();
-        MasterRenderer renderer = new MasterRenderer(loader);
+        RawModel bunnyModel = OBJFileLoader.loadOBJ("textures/test2", loader);
+        TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(
+                loader.loadTexture("textures/kirito")));
+        Swordman player = new Swordman(stanfordBunny, new Vector3f(75, 5, -75), 0, 100, 0, 0.6f, 100);
+      
+        Camera camera = new Camera(player);
+        MasterRenderer renderer = new MasterRenderer(loader,camera);
         TextMaster.init(loader);
         ParticleMaster.init(loader, renderer.getProjectionMatrix());
         
@@ -61,10 +67,7 @@ public class MainGameLoop {
         List<Light> lights = new ArrayList<Light>();
         List<WaterTile> waters = new ArrayList<WaterTile>();
         
-        RawModel bunnyModel = OBJFileLoader.loadOBJ("textures/test2", loader);
-        TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(
-                loader.loadTexture("textures/kirito")));
-        Swordman player = new Swordman(stanfordBunny, new Vector3f(75, 5, -75), 0, 100, 0, 0.6f, 100);
+      
         entities.add(player);
         
         RawModel tree = OBJFileLoader.loadOBJ("textures/pine",loader);
@@ -92,7 +95,7 @@ public class MainGameLoop {
         //END OF GUI
         
         //CAMERA****************
-        Camera camera = new Camera(player);
+      
         
         // *********TERRAIN TEXTURE STUFF**********
          
@@ -252,7 +255,7 @@ public class MainGameLoop {
             camera.move();
             particleSystem.generateParticles(sun.getPosition());            
             ParticleMaster.update(camera);
-                      
+            renderer.renderShadowMap(entities, sun);   
            
             GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
              

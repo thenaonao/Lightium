@@ -7,6 +7,7 @@ import java.util.Map;
 
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
+import org.lwjgl.opengl.GL13;
 import org.lwjgl.util.vector.Matrix4f;
 import org.lwjgl.util.vector.Vector4f;
 
@@ -17,6 +18,7 @@ import models.TexturedModel;
 import normalMappingRenderer.NormalMappingRenderer;
 import shaders.StaticShader;
 import shaders.TerrainShader;
+import shadows.ShadowMapMasterRenderer;
 import skybox.SkyboxRenderer;
 import terrains.Terrain;
 
@@ -39,6 +41,7 @@ public class MasterRenderer
     private TerrainShader terrainShader = new TerrainShader();
     
     private NormalMappingRenderer normalMapRenderer;
+    private ShadowMapMasterRenderer shadowMapRenderer;
     
     private Map<TexturedModel,List<Entity>> entities = new HashMap<TexturedModel,List<Entity>>();
     private Map<TexturedModel,List<Entity>> normalMapEntities = new HashMap<TexturedModel,List<Entity>>();
@@ -46,7 +49,7 @@ public class MasterRenderer
     
     private SkyboxRenderer skyboxRenderer;
     
-    public MasterRenderer(Loader loader){
+    public MasterRenderer(Loader loader, Camera camera){
         GL11.glEnable(GL11.GL_CULL_FACE);
         GL11.glCullFace(GL11.GL_BACK);
         createProjectionMatrix();
@@ -54,6 +57,7 @@ public class MasterRenderer
         terrainRenderer = new TerrainRenderer(terrainShader,projectionMatrix);
         skyboxRenderer = new SkyboxRenderer(loader,projectionMatrix);
         normalMapRenderer = new NormalMappingRenderer(projectionMatrix);
+        this.shadowMapRenderer = new ShadowMapMasterRenderer(camera);
     }
     
     
@@ -80,7 +84,7 @@ public class MasterRenderer
         terrainShader.loadSkycolor(RED, GREEN, BLUE);
         terrainShader.loadLights(lights);
         terrainShader.loadViewMatrix(camera);
-        terrainRenderer.render(terrains);
+        terrainRenderer.render(terrains, shadowMapRenderer.getToShadowMapSpaceMatrix());
         terrainShader.stop();
         skyboxRenderer.render(camera,RED, GREEN, BLUE);
         terrains.clear();
@@ -138,11 +142,24 @@ public class MasterRenderer
         }
     }
     
+    public void renderShadowMap(List<Entity> entityList, Light sun){
+        for(Entity entity: entityList){
+            processEntity(entity);
+        }
+        shadowMapRenderer.render(entities, sun);
+        entities.clear();
+    }
+    
+    public int getShadowMaptexture(){
+        return shadowMapRenderer.getShadowMap();
+    }
+    
     public void cleanUp()
     {
         normalMapRenderer.cleanUp();
         shader.cleanUp();
         terrainShader.cleanUp();
+        shadowMapRenderer.cleanUp();
     }
     
     public void prepare()
@@ -150,6 +167,8 @@ public class MasterRenderer
         GL11.glEnable(GL11.GL_DEPTH_TEST);
         GL11.glClear(GL11.GL_COLOR_BUFFER_BIT | GL11.GL_DEPTH_BUFFER_BIT);
         GL11.glClearColor(RED,GREEN, BLUE, 1);
+        GL13.glActiveTexture(GL13.GL_TEXTURE5);
+        GL11.glBindTexture(GL11.GL_TEXTURE_2D, getShadowMaptexture());
     }
     
     private void createProjectionMatrix()
