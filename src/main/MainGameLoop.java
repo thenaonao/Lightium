@@ -1,6 +1,5 @@
 package main;
  
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -16,6 +15,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import audio.AudioMaster;
+import collision.AABB;
+import collision.IntersectData;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -43,8 +44,9 @@ import textures.ModelTexture;
 import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.MousePicker;
+import toolbox.Vector3f_;
 import water.WaterFrameBuffers;
-import water.WaterRenderer; 
+import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
  
@@ -230,9 +232,23 @@ public class MainGameLoop {
         Fbo fbo = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_RENDER_BUFFER);
         PostProcessing.init(loader);
         
+        //
+        AABB aabb1  = new AABB(new Vector3f_(0.0f, 0.0f, 0.0f), new Vector3f_(1.0f, 1.0f, 1.0f));
+        AABB aabb2  = new AABB(new Vector3f_(1.0f, 1.0f, 1.0f),new  Vector3f_(2.0f, 2.0f, 2.0f));
+        AABB aabb3  = new AABB(new Vector3f_(1.0f, 0.0f, 0.0f),new  Vector3f_(2.0f, 1.0f, 1.0f));
+        AABB aabb4  = new AABB(new Vector3f_(0.0f, 0.0f, -2.0f),new Vector3f_(1.0f, 1.0f, -1.0f));
+        AABB aabb5  = new AABB(new Vector3f_(0.0f, 0.5f, 0.0f), new Vector3f_(1.0f, 1.5f, 1.0f));
+        
+        IntersectData aabb1Intersectaabb2 = aabb1.IntersectAABB(aabb2);
+        IntersectData aabb1Intersectaabb3 = aabb1.IntersectAABB(aabb3);
+        IntersectData aabb1Intersectaabb4 = aabb1.IntersectAABB(aabb4);
+        IntersectData aabb1Intersectaabb5 = aabb1.IntersectAABB(aabb5);
+        //
+        
+        
         final float hypo = 10000f;
         float hour,min,sec,houredminute;
-        
+      
         //****************Game Loop Below*********************
  
         while (!Display.isCloseRequested()) {
@@ -284,18 +300,19 @@ public class MainGameLoop {
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
             buffers.unbindCurrentFrameBuffer(); 
             
-            fbo.bindFrameBuffer();
+            //fbo.bindFrameBuffer();
             renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));    
             waterRenderer.render(waters, camera, sun);
             ParticleMaster.renderParticles(camera);
-            fbo.unbindFrameBuffer();
-            PostProcessing.doPostProcessing(fbo.getColourTexture());
+          //  fbo.unbindFrameBuffer();
+           // PostProcessing.doPostProcessing(fbo.getColourTexture());
             
             guiRenderer.render(guiTextures);
             TextMaster.render();
          
             DisplayManager.updateDisplay();
-         
+            
+          
           //  System.out.println(DisplayManager.getFrameTimeSeconds());
         }   
  

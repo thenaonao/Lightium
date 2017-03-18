@@ -91,9 +91,9 @@ public class Entity
     }
     
     public void increasePosition(Vector3f_ currentSpeed, float mult){
-        this.position.x += currentSpeed.x*mult;
-        this.position.y += currentSpeed.y*mult;
-        this.position.z += currentSpeed.z*mult;
+        this.position.x += currentSpeed.getX()*mult;
+        this.position.y += currentSpeed.getY()*mult;
+        this.position.z += currentSpeed.getZ()*mult;
     }
 
     public void increaseRotation(float dx, float dy, float dz)
@@ -118,9 +118,9 @@ public class Entity
     
     public void increaseRotation(Vector3f_ currentTurnSpeed, float mul)
     {
-        this.rotX += currentTurnSpeed.x*mul;
-        this.rotY += currentTurnSpeed.y*mul;
-        this.rotZ += currentTurnSpeed.z*mul;
+        this.rotX += currentTurnSpeed.getX()*mul;
+        this.rotY += currentTurnSpeed.getY()*mul;
+        this.rotZ += currentTurnSpeed.getZ()*mul;
     }
 
     public void setRotation(float dx, float dy, float dz){
