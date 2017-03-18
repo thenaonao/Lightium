@@ -23,15 +23,21 @@ public class StaticShader extends ShaderProgram{
     private int location_viewMatrix;
     private int location_lightPosition[];
     private int location_lightColour[];
+    private int location_attenuation[];
     private int location_shineDamper;
     private int location_reflectivity;
     private int location_useFakeLightning;
     private int location_skyColor;
     private int location_numberOfRows;
     private int location_offset;
-    private int location_attenuation[];
     private int location_plane;
+    private int location_toShadowMapSpace;
+    private int location_shadowMap;
+    private int location_specularMap;
+    private int location_usesSpecularMap;
+    private int location_modelTexture;
  
+    
     public StaticShader() {
         super(VERTEX_FILE, FRAGMENT_FILE);
     }
@@ -55,7 +61,11 @@ public class StaticShader extends ShaderProgram{
         location_numberOfRows = super.getUniformLocation("numberOfRows");
         location_offset = super.getUniformLocation("offset");
         location_plane = super.getUniformLocation("plane");
-        
+        location_specularMap=  super.getUniformLocation("specularMap");
+        location_usesSpecularMap= super.getUniformLocation("usesSpecularMap");
+        location_modelTexture=super.getUniformLocation("modelTexture");
+        location_toShadowMapSpace = super.getUniformLocation("toShadowMapSpace");
+        location_shadowMap = super.getUniformLocation("shadowMap");
         
         location_lightPosition = new int [MAX_LIGHTS];
         location_lightColour = new int [MAX_LIGHTS];
@@ -65,6 +75,16 @@ public class StaticShader extends ShaderProgram{
             location_lightColour[i] = super.getUniformLocation("lightColour["+ i + "]");
             location_attenuation[i] = super.getUniformLocation("attenuation["+ i + "]");
         }
+    }
+    
+    public void connectTextureUnits(){
+        super.loadInt(location_shadowMap, 5);
+        super.loadInt(location_modelTexture, 0);
+        super.loadInt(location_specularMap, 5);
+    }
+    
+    public void loadUseSpecularMap(boolean useMap){
+        super.loadBoolean(location_usesSpecularMap, useMap);
     }
     
     public void loadClipPlane( Vector4f vec){

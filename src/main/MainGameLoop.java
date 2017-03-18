@@ -160,21 +160,32 @@ public class MainGameLoop {
         boulderModel.getTexture().setShineDamper(10);
         boulderModel.getTexture().setReflectivity(0.5f);
          
+        
+        TexturedModel lanternModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/lantern", loader),
+                new ModelTexture(loader.loadTexture("textures/lantern")));
+        lanternModel.getTexture().setExtraInfoMap(loader.loadTexture("textures/lanternS"));
+        
+        TexturedModel cherryModel = new TexturedModel(OBJFileLoader.loadOBJ("textures/cherry", loader),new  ModelTexture(loader.loadTexture("textures/cherry")));
+        cherryModel.getTexture().setHasTransparency(true);
+        cherryModel.getTexture().setShineDamper(10);
+        cherryModel.getTexture().setReflectivity(0.5f);
+        cherryModel.getTexture().setExtraInfoMap(loader.loadTexture("textures/cherryS"));
          
         //************ENTITIES*******************
          
+       
         Entity entity = new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f);
         Entity entity2 = new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f);
         Entity entity3 = new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f);
         normalMapEntities.add(entity);
         normalMapEntities.add(entity2);
         normalMapEntities.add(entity3);
-         
-        Random random = new Random(5666778);
+        
+        Random random = new Random(584234465894584178L);
         for (int i = 0; i < 60; i++) {
             if (i % 3 == 0) {
-                float x = random.nextFloat() * 150;
-                float z = random.nextFloat() * -150;
+                float x = random.nextFloat() * 150+ random.nextInt();
+                float z = random.nextFloat() * -150+ random.nextInt();
                 if ((x > 50 && x < 100) || (z < -50 && z > -100)) {
                 } else {
                     float y = terrain.getHeightOfTerrain(x, z);
@@ -194,6 +205,14 @@ public class MainGameLoop {
                   
                     entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f));
                 }
+            }
+            if(i%30 == 0){
+                float x = random.nextFloat()*150;
+                float z = random.nextFloat()*-150;
+                Entity cherryTree = new Entity(cherryModel, new Vector3f(x,terrain.getHeightOfTerrain(x, z),z), 0, 0, 0, 8f); 
+                entities.add(cherryTree);
+                Entity lantern = new Entity(lanternModel,new Vector3f(400,terrain.getHeightOfTerrain(400, -400),-400),0,0,0,1f);
+                entities.add(lantern);
             }
         }
        
@@ -229,11 +248,12 @@ public class MainGameLoop {
      
         ParticleSystem particleSystem = new ParticleSystem(particleTexture,300,25,0.3f,4, 1);
         
-        Fbo fbo = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_RENDER_BUFFER);
+        Fbo multisampleFbo = new Fbo(Display.getWidth(), Display.getHeight());
+        Fbo outputFbo = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_TEXTURE);
         PostProcessing.init(loader);
         
         //
-        AABB aabb1  = new AABB(new Vector3f_(0.0f, 0.0f, 0.0f), new Vector3f_(1.0f, 1.0f, 1.0f));
+      /*  AABB aabb1  = new AABB(new Vector3f_(0.0f, 0.0f, 0.0f), new Vector3f_(1.0f, 1.0f, 1.0f));
         AABB aabb2  = new AABB(new Vector3f_(1.0f, 1.0f, 1.0f),new  Vector3f_(2.0f, 2.0f, 2.0f));
         AABB aabb3  = new AABB(new Vector3f_(1.0f, 0.0f, 0.0f),new  Vector3f_(2.0f, 1.0f, 1.0f));
         AABB aabb4  = new AABB(new Vector3f_(0.0f, 0.0f, -2.0f),new Vector3f_(1.0f, 1.0f, -1.0f));
@@ -242,7 +262,7 @@ public class MainGameLoop {
         IntersectData aabb1Intersectaabb2 = aabb1.IntersectAABB(aabb2);
         IntersectData aabb1Intersectaabb3 = aabb1.IntersectAABB(aabb3);
         IntersectData aabb1Intersectaabb4 = aabb1.IntersectAABB(aabb4);
-        IntersectData aabb1Intersectaabb5 = aabb1.IntersectAABB(aabb5);
+        IntersectData aabb1Intersectaabb5 = aabb1.IntersectAABB(aabb5);*/
         //
         
         
@@ -300,12 +320,13 @@ public class MainGameLoop {
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
             buffers.unbindCurrentFrameBuffer(); 
             
-            //fbo.bindFrameBuffer();
+            multisampleFbo.bindFrameBuffer();
             renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));    
             waterRenderer.render(waters, camera, sun);
             ParticleMaster.renderParticles(camera);
-          //  fbo.unbindFrameBuffer();
-           // PostProcessing.doPostProcessing(fbo.getColourTexture());
+            multisampleFbo.unbindFrameBuffer();
+            multisampleFbo.resolveToFbo(outputFbo);
+            PostProcessing.doPostProcessing(outputFbo.getColourTexture());
             
             guiRenderer.render(guiTextures);
             TextMaster.render();
@@ -317,9 +338,9 @@ public class MainGameLoop {
         }   
  
         //*********Clean Up Below**************
-        
         PostProcessing.cleanUp();
-        fbo.cleanUp();
+        outputFbo.cleanUp();     
+        multisampleFbo.cleanUp();
         AudioMaster.cleanUp();
         ParticleMaster.cleanUp();
         TextMaster.cleanUp();
