@@ -1,7 +1,5 @@
 package objConverter;
 
-import collision.AABB;
-
 public class ModelData {
  
     private float[] vertices;

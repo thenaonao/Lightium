@@ -16,8 +16,6 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import audio.AudioMaster;
-import collision.AABB;
-import collision.CollisionLib;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -192,7 +190,7 @@ public class MainGameLoop {
                 } else {
                     float y = terrain.getHeightOfTerrain(x, z);
                   
-                    entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f, new AABB(1,1,1)));
+                    entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f));
                 }
             }
         }

@@ -1,7 +1,5 @@
 package models;
 
-import collision.AABB;
-
 public class RawModel {
      
     private int vaoID;

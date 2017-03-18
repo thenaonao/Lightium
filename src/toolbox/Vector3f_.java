@@ -78,11 +78,31 @@ public class Vector3f_ extends Vector3f
         
         return this;
     }
+    public Vector3f add(float v, float w){
+        x += v;
+        y += w;
+        z += 0;
+        return this;
+    }
+    
+    public Vector3f add(float v, float w, float u){
+        x += v;
+        y += w;
+        z += u;
+        return this;
+    }
     
     public Vector3f sub(float v) {
         x -= v;
         y -= v;
         z -= v;
+        
+        return this;
+    }
+    public Vector3f sub(float u,float v,float w) {
+        x -= u;
+        y -= v;
+        z -= w;
         
         return this;
     }
