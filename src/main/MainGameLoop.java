@@ -42,7 +42,7 @@ import textures.TerrainTexture;
 import textures.TerrainTexturePack;
 import toolbox.MousePicker;
 import water.WaterFrameBuffers;
-import water.WaterRenderer;
+import water.WaterRenderer; 
 import water.WaterShader;
 import water.WaterTile;
  
@@ -80,7 +80,7 @@ public class MainGameLoop {
         
         //RENDER OF TEXT
         
-        FontType font = new FontType(loader.loadTexture("textures/saoWelcome"), new File("res/textures/saoWelcome.fnt"));
+        FontType font = new FontType(loader.loadTexture("textures/saoWelcome"), "saoWelcome");
         GUIText text = new GUIText("LV:" + player.getLevelString() , 0.7f, font, new Vector2f(0.088f, 0.066f), 0.25f, true);
         text.setColour(1f, 1f, 1f);
         GUIText health = new GUIText(player.getHealthString(), 0.7f, font , new Vector2f(0.007f, 0.066f), 0.3f, true);
@@ -251,7 +251,7 @@ public class MainGameLoop {
             int vertical = (int)(hypo*hypo*2*Math.PI * Math.cos(Math.toRadians((720+houredminute)*0.25f)));
             sun.setPosition(new Vector3f(-20,vertical,horizontal));
         //    System.out.println(houredminute);
-     
+           
             player.move(terrain);
             player.update();
             picker.update();

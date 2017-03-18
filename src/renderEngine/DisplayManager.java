@@ -4,6 +4,7 @@ import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.nio.ByteBuffer;
 
 import javax.imageio.ImageIO;
@@ -23,7 +24,7 @@ public class DisplayManager {
     private static final int HEIGHT = 720;
     private static final int FPS_CAP = 60;
 
-    private static final String TEXTURE = "res/textures/gameIcon.png";
+    private static final String TEXTURE = "/res/textures/gameIcon.png";
             
     private static final String TITLE = "[AProject] LIGHTIUM MMORPG";
 
@@ -40,7 +41,8 @@ public class DisplayManager {
         ByteBuffer[] list = new ByteBuffer[2]; 
         try
         {
-            image = ImageIO.read(new File(TEXTURE));
+         //   InputStreamReader isr = new InputStreamReader(Class.class.getResourceAsStream(TEXTURE));
+            image = ImageIO.read(Class.class.getResourceAsStream(TEXTURE));
         }
         catch(IOException e)
         {

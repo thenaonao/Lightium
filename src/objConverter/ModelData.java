@@ -1,12 +1,14 @@
 package objConverter;
- 
+
+import collision.AABB;
+
 public class ModelData {
  
     private float[] vertices;
     private float[] textureCoords;
     private float[] normals;
     private float[] tangents;
-    private int[] indices;
+    private int[] indices; 
     private float furthestPoint;
  
     public ModelData(float[] vertices, float[] textureCoords, float[] normals, float[] tangents, int[] indices,
@@ -42,5 +44,7 @@ public class ModelData {
     public float getFurthestPoint() {
         return furthestPoint;
     }
+    
+
  
 }
