@@ -241,8 +241,6 @@ public class MainGameLoop {
              * 1440 = 24H NIGHT
              * 720 = 12H DAY
              */
-          
-            
             if(houredminute > 1440)houredminute = 0;
             int horizontal = (int)(hypo*hypo*2*Math.PI * Math.sin(Math.toRadians((720+houredminute)*0.25f)));
             int vertical = (int)(hypo*hypo*2*Math.PI * Math.cos(Math.toRadians((720+houredminute)*0.25f)));
