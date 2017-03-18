@@ -6,6 +6,8 @@ import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
 
+import org.lwjgl.openal.AL10;
+import org.lwjgl.openal.AL11;
 import org.lwjgl.opengl.Display;
 import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL30;
@@ -13,6 +15,7 @@ import org.lwjgl.util.vector.Vector2f;
 import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
+import audio.AudioMaster;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -47,9 +50,11 @@ public class MainGameLoop {
  
    
     public static void main(String[] args) {
-        int number = 0;
         DisplayManager.createDisplay();
         Loader loader = new Loader();
+        AudioMaster.init();
+        AudioMaster.setListenerData(0, 0, 0); 
+        AL10.alDistanceModel(AL11.AL_LINEAR_DISTANCE_CLAMPED);
         RawModel bunnyModel = OBJFileLoader.loadOBJ("textures/test2", loader);
         TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(
                 loader.loadTexture("textures/kirito")));
@@ -245,7 +250,7 @@ public class MainGameLoop {
             int horizontal = (int)(hypo*hypo*2*Math.PI * Math.sin(Math.toRadians((720+houredminute)*0.25f)));
             int vertical = (int)(hypo*hypo*2*Math.PI * Math.cos(Math.toRadians((720+houredminute)*0.25f)));
             sun.setPosition(new Vector3f(-20,vertical,horizontal));
-            System.out.println(houredminute);
+        //    System.out.println(houredminute);
      
             player.move(terrain);
             player.update();
@@ -286,6 +291,7 @@ public class MainGameLoop {
  
         //*********Clean Up Below**************
         
+        AudioMaster.cleanUp();
         ParticleMaster.cleanUp();
         TextMaster.cleanUp();
         buffers.cleanUp();

@@ -5,6 +5,8 @@ import models.TexturedModel;
 import org.lwjgl.input.Keyboard;
 import org.lwjgl.util.vector.Vector3f;
 
+import audio.AudioMaster;
+import audio.Source;
 import main.MainGameLoop;
 import renderEngine.DisplayManager;
 import terrains.Terrain;
@@ -34,7 +36,8 @@ public class Player extends Entity {
     protected int attack;
     protected int xp;
     
-
+    
+    
     private boolean isInAir = false;
 
     public Player(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale) {
@@ -82,10 +85,15 @@ public class Player extends Entity {
     }
 
     private void jump() {
+      
         if (!isInAir) {
             this.upwardsSpeed = JUMP_POWER;
             isInAir = true;
+            
+           
         }
+      
+       
     }
 
     private void checkInputs() {
