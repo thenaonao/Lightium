@@ -16,6 +16,8 @@ import org.lwjgl.util.vector.Vector3f;
 import org.lwjgl.util.vector.Vector4f;
 
 import audio.AudioMaster;
+import collision.AABB;
+import collision.CollisionLib;
 import entities.Camera;
 import entities.Entity;
 import entities.Light;
@@ -32,6 +34,8 @@ import objConverter.OBJFileLoader;
 import particles.ParticleMaster;
 import particles.ParticleSystem;
 import particles.ParticleTexture;
+import postProcessing.Fbo;
+import postProcessing.PostProcessing;
 import renderEngine.DisplayManager;
 import renderEngine.Loader;
 import renderEngine.MasterRenderer;
@@ -188,7 +192,7 @@ public class MainGameLoop {
                 } else {
                     float y = terrain.getHeightOfTerrain(x, z);
                   
-                    entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f));
+                    entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f, new AABB(1,1,1)));
                 }
             }
         }
@@ -225,7 +229,8 @@ public class MainGameLoop {
      
         ParticleSystem particleSystem = new ParticleSystem(particleTexture,300,25,0.3f,4, 1);
         
-       
+        Fbo fbo = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_RENDER_BUFFER);
+        PostProcessing.init(loader);
         
         final float hypo = 10000f;
         float hour,min,sec,houredminute;
@@ -252,6 +257,8 @@ public class MainGameLoop {
             sun.setPosition(new Vector3f(-20,vertical,horizontal));
         //    System.out.println(houredminute);
            
+            //CollisionLib.testAABBAABB(player.getBox(), entity.getBox());
+            
             player.move(terrain);
             player.update();
             picker.update();
@@ -278,9 +285,14 @@ public class MainGameLoop {
             //render to screen
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
             buffers.unbindCurrentFrameBuffer(); 
+            
+            fbo.bindFrameBuffer();
             renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));    
             waterRenderer.render(waters, camera, sun);
             ParticleMaster.renderParticles(camera);
+            fbo.unbindFrameBuffer();
+            PostProcessing.doPostProcessing(fbo.getColourTexture());
+            
             guiRenderer.render(guiTextures);
             TextMaster.render();
          
@@ -291,6 +303,8 @@ public class MainGameLoop {
  
         //*********Clean Up Below**************
         
+        PostProcessing.cleanUp();
+        fbo.cleanUp();
         AudioMaster.cleanUp();
         ParticleMaster.cleanUp();
         TextMaster.cleanUp();

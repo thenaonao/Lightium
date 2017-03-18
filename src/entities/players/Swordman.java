@@ -2,9 +2,9 @@ package entities.players;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import collision.AABB;
 import entities.Player;
 import models.TexturedModel;
-import renderEngine.DisplayManager;
 
 public class Swordman extends Player{
     
@@ -26,6 +26,7 @@ public class Swordman extends Player{
         this.health = this.maxHealth;
         this.maxEndurance = calculateMaxEndurance(level);
         this.endurance = this.maxEndurance;
+        super.box = new AABB(1,2,1);
     }
     
     public Swordman update(){

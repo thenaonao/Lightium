@@ -5,11 +5,15 @@ import toolbox.Vector3f_;
 
 import org.lwjgl.util.vector.Vector3f;
 
+import collision.AABB;
+import collision.CollisionLib;
+
 public class Entity
 {
 
     private TexturedModel model;
     private Vector3f position;
+    protected AABB box;
     private float rotX, rotY, rotZ;
     private float scale;
 
@@ -23,6 +27,16 @@ public class Entity
      * @param rotZ
      * @param scale
      */
+    public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale, AABB box)
+    {
+        this.model = model;
+        this.position = position;
+        this.rotX = rotX;
+        this.rotY = rotY;
+        this.rotZ = rotZ;
+        this.scale = scale;
+        this.box = box;
+    }
     public Entity(TexturedModel model, Vector3f position, float rotX, float rotY, float rotZ, float scale)
     {
         this.model = model;
@@ -31,6 +45,7 @@ public class Entity
         this.rotY = rotY;
         this.rotZ = rotZ;
         this.scale = scale;
+        this.box = new AABB(0,0,0);
     }
 
     /**
@@ -43,6 +58,17 @@ public class Entity
      * @param rotZ
      * @param scale
      */
+    public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale, AABB box)
+    {
+        this.textureIndex = index;
+        this.model = model;
+        this.position = position;
+        this.rotX = rotX;
+        this.rotY = rotY;
+        this.rotZ = rotZ;
+        this.scale = scale;
+        this.box = box;
+    }
     public Entity(TexturedModel model, int index, Vector3f position, float rotX, float rotY, float rotZ, float scale)
     {
         this.textureIndex = index;
@@ -52,7 +78,16 @@ public class Entity
         this.rotY = rotY;
         this.rotZ = rotZ;
         this.scale = scale;
+        this.box = new AABB(0,0,0);
     }
+    
+    public AABB getBox(){
+        return box;
+    }
+    
+   /* public void collision(){
+        CollisionLib.testAABBAABB(box, null);
+    }*/
 
     public float getTextureXOffset()
     {

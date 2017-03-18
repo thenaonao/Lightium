@@ -118,7 +118,8 @@ public class Camera
     }
 
     private void calculateAngleAroundPlayer()
-    {
+    { 
+      
         float angleChange = Mouse.getDX() * 0.3f;
         if(Mouse.isButtonDown(2))
         {
@@ -144,8 +145,10 @@ public class Camera
         if(Keyboard.isKeyDown(Keyboard.KEY_NUMPAD1))
         {
             angleAroundPlayer = 180;
+        }else {
+            angleAroundPlayer = 0;
         }
-        angleAroundPlayer = 0;
+       
     }
 
     public void invertPitch()
