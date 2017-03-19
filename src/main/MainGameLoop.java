@@ -212,7 +212,7 @@ public class MainGameLoop
 
         // *******************OTHER SETUP***************
 
-        Light sun = new Light(new Vector3f(0, 0, 0), new Vector3f(1.3f, 1.3f, 1.3f));
+        Light sun = new Light(new Vector3f(0, 0, 0), new Vector3f(0,0,0));
         lights.add(sun);
 
         GuiBarRender guiRenderer = new GuiBarRender(loader, new Vector2f(18, 3), 215, 85);
@@ -267,8 +267,8 @@ public class MainGameLoop
             hour = time.get(Calendar.HOUR_OF_DAY);
             min = time.get(Calendar.MINUTE);
             sec = time.get(Calendar.SECOND);
-            // houredminute = min +hour*60+timeTester;
-            houredminute = 1 + timeTester;
+             houredminute = min +hour*60+timeTester;
+           
             /*
              * Sun System
              * 1440 = 24H NIGHT
@@ -277,7 +277,6 @@ public class MainGameLoop
             if(houredminute == 1440)
             {
                 houredminute = 0;
-                timeTester = 0;
                 sun.setColour(new Vector3f(0, 0, 0));
             }
             else if(houredminute > 1080)
@@ -296,8 +295,9 @@ public class MainGameLoop
             int vertical = (int)(hypo * hypo * 2 * Math.PI * Math.cos(Math.toRadians((720 + houredminute) * 0.25f)));
             sun.setPosition(new Vector3f(-20, vertical, horizontal));
             int position3d = ((horizontal * vertical) / 6);
-            timeTester++;
-            System.out.println(sun.getColour() + "   " + houredminute);
+            
+            
+            System.out.println(player.getPosition());
             // System.out.println(houredminute);
 
             // CollisionLib.testAABBAABB(player.getBox(), entity.getBox());

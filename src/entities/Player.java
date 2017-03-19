@@ -105,6 +105,8 @@ public class Player extends Entity {
             super.increasePosition(-sx, 0 ,-sz);
         } else if (Keyboard.isKeyDown(Keyboard.KEY_Q)) {
             super.increasePosition(sx, 0 ,sz);
+        }else{
+           
         }
       
         
@@ -113,7 +115,7 @@ public class Player extends Entity {
         } else if (Keyboard.isKeyDown(Keyboard.KEY_S) || Keyboard.isKeyDown(Keyboard.KEY_DOWN)) {
             this.currentSpeed = -RUN_SPEED;
         } else {
-            this.currentSpeed = 0;
+            this.currentSpeed /=1.2;
         }
 
         if (Keyboard.isKeyDown(Keyboard.KEY_E) || Keyboard.isKeyDown(Keyboard.KEY_RIGHT)) {
