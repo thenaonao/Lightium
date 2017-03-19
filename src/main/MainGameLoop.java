@@ -1,5 +1,5 @@
 package main;
- 
+
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -49,300 +49,307 @@ import water.WaterFrameBuffers;
 import water.WaterRenderer;
 import water.WaterShader;
 import water.WaterTile;
- 
-public class MainGameLoop {
- 
-   
-    public static void main(String[] args) {
+
+public class MainGameLoop
+{
+
+    public static void main(String[] args)
+    {
         DisplayManager.createDisplay();
         Loader loader = new Loader();
         AudioMaster.init();
-        AudioMaster.setListenerData(0, 0, 0); 
+        AudioMaster.setListenerData(0, 0, 0);
         AL10.alDistanceModel(AL11.AL_LINEAR_DISTANCE_CLAMPED);
         RawModel bunnyModel = OBJFileLoader.loadOBJ("textures/test2", loader);
-        TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(
-                loader.loadTexture("textures/kirito")));
+        TexturedModel stanfordBunny = new TexturedModel(bunnyModel, new ModelTexture(loader.loadTexture("textures/kirito")));
         Swordman player = new Swordman(stanfordBunny, new Vector3f(75, 5, -75), 0, 100, 0, 0.6f, 100);
-      
+
         Camera camera = new Camera(player);
-        MasterRenderer renderer = new MasterRenderer(loader,camera);
+        MasterRenderer renderer = new MasterRenderer(loader, camera);
         TextMaster.init(loader);
         ParticleMaster.init(loader, renderer.getProjectionMatrix());
-        
+
         List<Terrain> terrains = new ArrayList<Terrain>();
         List<Entity> entities = new ArrayList<Entity>();
         List<GuiTexture> guiTextures = new ArrayList<GuiTexture>();
         List<Entity> normalMapEntities = new ArrayList<Entity>();
         List<Light> lights = new ArrayList<Light>();
         List<WaterTile> waters = new ArrayList<WaterTile>();
-        
-      
+
         entities.add(player);
-        
-        RawModel tree = OBJFileLoader.loadOBJ("textures/pine",loader);
+
+        RawModel tree = OBJFileLoader.loadOBJ("textures/pine", loader);
         TexturedModel standTree = new TexturedModel(tree, new ModelTexture(loader.loadTexture("textures/pine")));
-        
-        //RENDER OF TEXT
-        
+
+        // RENDER OF TEXT
+
         FontType font = new FontType(loader.loadTexture("textures/saoWelcome"), "saoWelcome");
-        GUIText text = new GUIText("LV:" + player.getLevelString() , 0.7f, font, new Vector2f(0.088f, 0.066f), 0.25f, true);
+        GUIText text = new GUIText("LV:" + player.getLevelString(), 0.7f, font, new Vector2f(0.088f, 0.066f), 0.25f, true);
         text.setColour(1f, 1f, 1f);
-        GUIText health = new GUIText(player.getHealthString(), 0.7f, font , new Vector2f(0.007f, 0.066f), 0.3f, true);
-        GUIText maxHealth = new GUIText(player.getMaxHealthString(), 0.7f, font , new Vector2f(0.034f, 0.066f), 0.3f, true);
-        
+        GUIText health = new GUIText(player.getHealthString(), 0.7f, font, new Vector2f(0.007f, 0.066f), 0.3f, true);
+        GUIText maxHealth = new GUIText(player.getMaxHealthString(), 0.7f, font, new Vector2f(0.034f, 0.066f), 0.3f, true);
+
         health.setColour(1f, 1f, 1f);
         maxHealth.setColour(1f, 1f, 1f);
-        
-        //END OF RENDER TEXT
-        
+
+        // END OF RENDER TEXT
+
         // GUI
-        
-        GuiTexture gui = new GuiTexture(loader.loadTexture("textures/NewPlayerViewHealthOverlay"), new Vector2f(-0.76f, 0.65f), new Vector2f(0.26f,0.26f));
+
+        GuiTexture gui = new GuiTexture(loader.loadTexture("textures/NewPlayerViewHealthOverlay"), new Vector2f(-0.76f, 0.65f), new Vector2f(0.26f, 0.26f));
         guiTextures.add(gui);
-      /*  GuiTexture gui2 = new GuiTexture(loader.loadTexture("textures/NewPlayerViewHealthOverlay"), new Vector2f(0,0), new Vector2f(0.5f,0.5f));
-        guiTextures.add(gui2); */
-        //END OF GUI
-        
-        //CAMERA****************
-      
-        
+        /*
+         * GuiTexture gui2 = new GuiTexture(loader.loadTexture("textures/NewPlayerViewHealthOverlay"), new Vector2f(0,0), new Vector2f(0.5f,0.5f));
+         * guiTextures.add(gui2);
+         */
+        // END OF GUI
+
+        // CAMERA****************
+
         // *********TERRAIN TEXTURE STUFF**********
-         
+
         TerrainTexture backgroundTexture = new TerrainTexture(loader.loadTexture("textures/grassy2"));
         TerrainTexture rTexture = new TerrainTexture(loader.loadTexture("textures/mud"));
         TerrainTexture gTexture = new TerrainTexture(loader.loadTexture("textures/grassFlowers"));
         TerrainTexture bTexture = new TerrainTexture(loader.loadTexture("textures/path"));
- 
-        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture,
-                gTexture, bTexture);
+
+        TerrainTexturePack texturePack = new TerrainTexturePack(backgroundTexture, rTexture, gTexture, bTexture);
         TerrainTexture blendMap = new TerrainTexture(loader.loadTexture("textures/blendMap"));
- 
+
         // *****************************************
- 
-        
+
         ModelTexture fernTextureAtlas = new ModelTexture(loader.loadTexture("textures/fern"));
         fernTextureAtlas.setNumberOfRows(2);
- 
-        TexturedModel fern = new TexturedModel(OBJFileLoader.loadOBJ("textures/fern", loader),
-                fernTextureAtlas);
- 
-        
- 
+
+        TexturedModel fern = new TexturedModel(OBJFileLoader.loadOBJ("textures/fern", loader), fernTextureAtlas);
+
         fern.getTexture().setHasTransparency(true);
- 
+
         Terrain terrain = new Terrain(0, -1, loader, texturePack, blendMap, "textures/heightmap");
-       
+
         terrains.add(terrain);
- 
-        TexturedModel lamp = new TexturedModel(OBJLoader.loadObjModel("textures/lamp", loader),
-                new ModelTexture(loader.loadTexture("textures/lamp")));
+
+        TexturedModel lamp = new TexturedModel(OBJLoader.loadObjModel("textures/lamp", loader), new ModelTexture(loader.loadTexture("textures/lamp")));
         lamp.getTexture().setUseFakeLighting(true);
- 
-        
-          
-        //******************NORMAL MAP MODELS************************
-         
-        TexturedModel barrelModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/barrel", loader),
-                new ModelTexture(loader.loadTexture("textures/barrel")));
+
+        // ******************NORMAL MAP MODELS************************
+
+        TexturedModel barrelModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/barrel", loader), new ModelTexture(loader.loadTexture("textures/barrel")));
         barrelModel.getTexture().setNormalMap(loader.loadTexture("textures/barrelNormal"));
         barrelModel.getTexture().setShineDamper(10);
         barrelModel.getTexture().setReflectivity(0.5f);
-         
-        TexturedModel crateModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/crate", loader),
-                new ModelTexture(loader.loadTexture("textures/crate")));
+
+        TexturedModel crateModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/crate", loader), new ModelTexture(loader.loadTexture("textures/crate")));
         crateModel.getTexture().setNormalMap(loader.loadTexture("textures/crateNormal"));
         crateModel.getTexture().setShineDamper(10);
         crateModel.getTexture().setReflectivity(0.5f);
-         
-        TexturedModel boulderModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/boulder", loader),
-                new ModelTexture(loader.loadTexture("textures/boulder")));
+
+        TexturedModel boulderModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/boulder", loader), new ModelTexture(loader.loadTexture("textures/boulder")));
         boulderModel.getTexture().setNormalMap(loader.loadTexture("textures/boulderNormal"));
         boulderModel.getTexture().setShineDamper(10);
         boulderModel.getTexture().setReflectivity(0.5f);
-         
-        
-        TexturedModel lanternModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/lantern", loader),
-                new ModelTexture(loader.loadTexture("textures/lantern")));
+
+        TexturedModel lanternModel = new TexturedModel(NormalMappedObjLoader.loadOBJ("textures/lantern", loader), new ModelTexture(loader.loadTexture("textures/lantern")));
         lanternModel.getTexture().setExtraInfoMap(loader.loadTexture("textures/lanternS"));
-        
-        TexturedModel cherryModel = new TexturedModel(OBJFileLoader.loadOBJ("textures/cherry", loader),new  ModelTexture(loader.loadTexture("textures/cherry")));
+
+        TexturedModel cherryModel = new TexturedModel(OBJFileLoader.loadOBJ("textures/cherry", loader), new ModelTexture(loader.loadTexture("textures/cherry")));
         cherryModel.getTexture().setHasTransparency(true);
         cherryModel.getTexture().setShineDamper(10);
         cherryModel.getTexture().setReflectivity(0.5f);
         cherryModel.getTexture().setExtraInfoMap(loader.loadTexture("textures/cherryS"));
-         
-        //************ENTITIES*******************
-         
-       
+
+        // ************ENTITIES*******************
+
         Entity entity = new Entity(barrelModel, new Vector3f(75, 10, -75), 0, 0, 0, 1f);
         Entity entity2 = new Entity(boulderModel, new Vector3f(85, 10, -75), 0, 0, 0, 1f);
         Entity entity3 = new Entity(crateModel, new Vector3f(65, 10, -75), 0, 0, 0, 0.04f);
         normalMapEntities.add(entity);
         normalMapEntities.add(entity2);
         normalMapEntities.add(entity3);
-        
+
         Random random = new Random(584234465894584178L);
-        for (int i = 0; i < 60; i++) {
-            if (i % 3 == 0) {
-                float x = random.nextFloat() * 150+ random.nextInt();
-                float z = random.nextFloat() * -150+ random.nextInt();
-                if ((x > 50 && x < 100) || (z < -50 && z > -100)) {
-                } else {
+        for(int i = 0; i < 60; i++)
+        {
+            if(i % 3 == 0)
+            {
+                float x = random.nextFloat() * 150 + random.nextInt();
+                float z = random.nextFloat() * -150 + random.nextInt();
+                if((x > 50 && x < 100) || (z < -50 && z > -100))
+                {}
+                else
+                {
                     float y = terrain.getHeightOfTerrain(x, z);
- 
-                    entities.add(new Entity(fern, 3, new Vector3f(x, y, z), 0,
-                            random.nextFloat() * 360, 0, 0.9f));
+
+                    entities.add(new Entity(fern, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 0.9f));
                 }
             }
-            if (i % 2 == 0) {
- 
+            if(i % 2 == 0)
+            {
+
                 float x = random.nextFloat() * 150;
                 float z = random.nextFloat() * -150;
-                if ((x > 200 && x < 400) || (z < -200 && z > -400)) {
- 
-                } else {
+                if((x > 200 && x < 400) || (z < -200 && z > -400))
+                {
+
+                }
+                else
+                {
                     float y = terrain.getHeightOfTerrain(x, z);
-                  
-                    entities.add(new Entity(standTree,3,new Vector3f(x,y,z),0, random.nextFloat()* 360,0, 2f));
+
+                    entities.add(new Entity(standTree, 3, new Vector3f(x, y, z), 0, random.nextFloat() * 360, 0, 2f));
                 }
             }
-            if(i%30 == 0){
-                float x = random.nextFloat()*150;
-                float z = random.nextFloat()*-150;
-                Entity cherryTree = new Entity(cherryModel, new Vector3f(x,terrain.getHeightOfTerrain(x, z),z), 0, 0, 0, 8f); 
+            if(i % 30 == 0)
+            {
+                float x = random.nextFloat() * 150;
+                float z = random.nextFloat() * -150;
+                Entity cherryTree = new Entity(cherryModel, new Vector3f(x, terrain.getHeightOfTerrain(x, z), z), 0, 0, 0, 8f);
                 entities.add(cherryTree);
-                Entity lantern = new Entity(lanternModel,new Vector3f(400,terrain.getHeightOfTerrain(400, -400),-400),0,0,0,1f);
+                Entity lantern = new Entity(lanternModel, new Vector3f(400, terrain.getHeightOfTerrain(400, -400), -400), 0, 0, 0, 1f);
                 entities.add(lantern);
             }
         }
-       
-         
-        //*******************OTHER SETUP***************
- 
-       
-      
+
+        // *******************OTHER SETUP***************
+
         Light sun = new Light(new Vector3f(0, 0, 0), new Vector3f(1.3f, 1.3f, 1.3f));
         lights.add(sun);
- 
-        
- 
-        
- 
-       
-         
-        GuiBarRender guiRenderer = new GuiBarRender(loader, new Vector2f(18,3), 215, 85);
+
+        GuiBarRender guiRenderer = new GuiBarRender(loader, new Vector2f(18, 3), 215, 85);
         MousePicker picker = new MousePicker(camera, renderer.getProjectionMatrix(), terrain);
-     
-        //**********Water Renderer Set-up************************
-         
+
+        // **********Water Renderer Set-up************************
+
         WaterFrameBuffers buffers = new WaterFrameBuffers();
         WaterShader waterShader = new WaterShader();
         WaterRenderer waterRenderer = new WaterRenderer(loader, waterShader, renderer.getProjectionMatrix(), buffers);
-        
+
         WaterTile water = new WaterTile(0, 0, 20);
         waters.add(water);
-         
-        
-        
-        ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("textures/spark"),4);
-     
-        ParticleSystem particleSystem = new ParticleSystem(particleTexture,300,25,0.3f,4, 1);
-        
+
+        ParticleTexture particleTexture = new ParticleTexture(loader.loadTexture("textures/spark"), 4);
+
+        ParticleSystem particleSystem = new ParticleSystem(particleTexture, 300, 25, 0.3f, 4, 1);
+
         Fbo multisampleFbo = new Fbo(Display.getWidth(), Display.getHeight());
         Fbo outputFbo = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_TEXTURE);
         Fbo outputFbo2 = new Fbo(Display.getWidth(), Display.getHeight(), Fbo.DEPTH_TEXTURE);
         PostProcessing.init(loader);
-        
+
         //
-      /*  AABB aabb1  = new AABB(new Vector3f_(0.0f, 0.0f, 0.0f), new Vector3f_(1.0f, 1.0f, 1.0f));
-        AABB aabb2  = new AABB(new Vector3f_(1.0f, 1.0f, 1.0f),new  Vector3f_(2.0f, 2.0f, 2.0f));
-        AABB aabb3  = new AABB(new Vector3f_(1.0f, 0.0f, 0.0f),new  Vector3f_(2.0f, 1.0f, 1.0f));
-        AABB aabb4  = new AABB(new Vector3f_(0.0f, 0.0f, -2.0f),new Vector3f_(1.0f, 1.0f, -1.0f));
-        AABB aabb5  = new AABB(new Vector3f_(0.0f, 0.5f, 0.0f), new Vector3f_(1.0f, 1.5f, 1.0f));
-        
-        IntersectData aabb1Intersectaabb2 = aabb1.IntersectAABB(aabb2);
-        IntersectData aabb1Intersectaabb3 = aabb1.IntersectAABB(aabb3);
-        IntersectData aabb1Intersectaabb4 = aabb1.IntersectAABB(aabb4);
-        IntersectData aabb1Intersectaabb5 = aabb1.IntersectAABB(aabb5);*/
+        /*
+         * AABB aabb1 = new AABB(new Vector3f_(0.0f, 0.0f, 0.0f), new Vector3f_(1.0f, 1.0f, 1.0f));
+         * AABB aabb2 = new AABB(new Vector3f_(1.0f, 1.0f, 1.0f),new Vector3f_(2.0f, 2.0f, 2.0f));
+         * AABB aabb3 = new AABB(new Vector3f_(1.0f, 0.0f, 0.0f),new Vector3f_(2.0f, 1.0f, 1.0f));
+         * AABB aabb4 = new AABB(new Vector3f_(0.0f, 0.0f, -2.0f),new Vector3f_(1.0f, 1.0f, -1.0f));
+         * AABB aabb5 = new AABB(new Vector3f_(0.0f, 0.5f, 0.0f), new Vector3f_(1.0f, 1.5f, 1.0f));
+         * IntersectData aabb1Intersectaabb2 = aabb1.IntersectAABB(aabb2);
+         * IntersectData aabb1Intersectaabb3 = aabb1.IntersectAABB(aabb3);
+         * IntersectData aabb1Intersectaabb4 = aabb1.IntersectAABB(aabb4);
+         * IntersectData aabb1Intersectaabb5 = aabb1.IntersectAABB(aabb5);
+         */
         //
-        
-        
+
         final float hypo = 10000f;
-        float hour,min,sec,houredminute;
-      
-        //****************Game Loop Below*********************
- 
-        while (!Display.isCloseRequested()) {
-          /*  number++;
-             text.setString(number+"");    UpdateStringGUI , IT WORKS!
-             text.update(); */
+        float hour, min, sec, houredminute;
+        int timeTester = 0;
+        // ****************Game Loop Below*********************
+
+        while(!Display.isCloseRequested())
+        {
+            /*
+             * number++;
+             * text.setString(number+""); UpdateStringGUI , IT WORKS!
+             * text.update();
+             */
+
             Calendar time = Calendar.getInstance();
-             hour = time.get(Calendar.HOUR_OF_DAY);
-             min = time.get(Calendar.MINUTE);
-             sec = time.get(Calendar.SECOND);
-             houredminute = min +hour*60;
-            /* Sun System
-             *
+            hour = time.get(Calendar.HOUR_OF_DAY);
+            min = time.get(Calendar.MINUTE);
+            sec = time.get(Calendar.SECOND);
+            // houredminute = min +hour*60+timeTester;
+            houredminute = 1 + timeTester;
+            /*
+             * Sun System
              * 1440 = 24H NIGHT
              * 720 = 12H DAY
              */
-            if(houredminute > 1440)houredminute = 0;
-            int horizontal = (int)(hypo*hypo*2*Math.PI * Math.sin(Math.toRadians((720+houredminute)*0.25f)));
-            int vertical = (int)(hypo*hypo*2*Math.PI * Math.cos(Math.toRadians((720+houredminute)*0.25f)));
-            sun.setPosition(new Vector3f(-20,vertical,horizontal));
-        //    System.out.println(houredminute);
-           
-            //CollisionLib.testAABBAABB(player.getBox(), entity.getBox());
-            
+            if(houredminute == 1440)
+            {
+                houredminute = 0;
+                timeTester = 0;
+                sun.setColour(new Vector3f(0, 0, 0));
+            }
+            else if(houredminute > 1080)
+            {
+                sun.setColour(new Vector3f(1, 0.1f, 0.25f));
+            }
+            else if(houredminute > 480)
+            {
+                sun.setColour(new Vector3f(1, 1, 1));
+            }
+            else if(houredminute > 360)
+            {
+                sun.setColour(new Vector3f(1, 0.25f, 0.1f));
+            }
+            int horizontal = (int)(hypo * hypo * 2 * Math.PI * Math.sin(Math.toRadians((720 + houredminute) * 0.25f)));
+            int vertical = (int)(hypo * hypo * 2 * Math.PI * Math.cos(Math.toRadians((720 + houredminute) * 0.25f)));
+            sun.setPosition(new Vector3f(-20, vertical, horizontal));
+            int position3d = ((horizontal * vertical) / 6);
+            timeTester++;
+            System.out.println(sun.getColour() + "   " + houredminute);
+            // System.out.println(houredminute);
+
+            // CollisionLib.testAABBAABB(player.getBox(), entity.getBox());
+
             player.move(terrain);
             player.update();
             picker.update();
             camera.move();
-            particleSystem.generateParticles(sun.getPosition());            
+            particleSystem.generateParticles(sun.getPosition());
             ParticleMaster.update(camera);
-            renderer.renderShadowMap(entities, sun);   
-           
+            renderer.renderShadowMap(entities, sun);
+
             GL11.glEnable(GL30.GL_CLIP_DISTANCE0);
-             
-            //render reflection texture
+
+            // render reflection texture
             buffers.bindReflectionFrameBuffer();
             float distance = 2 * (camera.getPosition().y - water.getHeight());
             camera.getPosition().y -= distance;
             camera.invertPitch();
-            renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight()+1));
+            renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, 1, 0, -water.getHeight() + 1));
             camera.getPosition().y += distance;
             camera.invertPitch();
-             
-            //render refraction texture
+
+            // render refraction texture
             buffers.bindRefractionFrameBuffer();
             renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, water.getHeight()));
-             
-            //render to screen
+
+            // render to screen
             GL11.glDisable(GL30.GL_CLIP_DISTANCE0);
-            buffers.unbindCurrentFrameBuffer(); 
-            
+            buffers.unbindCurrentFrameBuffer();
+
             multisampleFbo.bindFrameBuffer();
-            renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));    
+            renderer.renderScene(entities, normalMapEntities, terrains, lights, camera, new Vector4f(0, -1, 0, 100000));
             waterRenderer.render(waters, camera, sun);
             ParticleMaster.renderParticles(camera);
             multisampleFbo.unbindFrameBuffer();
             multisampleFbo.resolveToFbo(GL30.GL_COLOR_ATTACHMENT0, outputFbo);
             multisampleFbo.resolveToFbo(GL30.GL_COLOR_ATTACHMENT1, outputFbo2);
-            PostProcessing.doPostProcessing(outputFbo.getColourTexture(),outputFbo2.getColourTexture());
-            
+            PostProcessing.doPostProcessing(outputFbo.getColourTexture(), outputFbo2.getColourTexture());
+
             guiRenderer.render(guiTextures);
             TextMaster.render();
-         
+
             DisplayManager.updateDisplay();
-            
-          
-          //  System.out.println(DisplayManager.getFrameTimeSeconds());
-        }   
- 
-        //*********Clean Up Below**************
+
+            // System.out.println(DisplayManager.getFrameTimeSeconds());
+        }
+
+        // *********Clean Up Below**************
         PostProcessing.cleanUp();
         outputFbo2.cleanUp();
-        outputFbo.cleanUp();     
+        outputFbo.cleanUp();
         multisampleFbo.cleanUp();
         AudioMaster.cleanUp();
         ParticleMaster.cleanUp();
@@ -354,8 +361,7 @@ public class MainGameLoop {
         renderer.cleanUp();
         loader.cleanUp();
         DisplayManager.closeDisplay();
- 
+
     }
- 
- 
+
 }
