@@ -5,6 +5,8 @@ import org.lwjgl.opengl.GL11;
 import org.lwjgl.opengl.GL20;
 import org.lwjgl.opengl.GL30;
 
+import bloom.BrightFilter;
+import bloom.CombineFilter;
 import gaussianBlur.HorizontalBlur;
 import gaussianBlur.VerticalBlur;
 import models.RawModel;
@@ -15,34 +17,36 @@ public class PostProcessing {
 	private static final float[] POSITIONS = { -1, 1, -1, -1, 1, 1, 1, -1 };	
 	private static RawModel quad;
 	private static ContrastChanger contrastChanger;
+	private static BrightFilter brightFilter;
 	private static HorizontalBlur hblur;
 	private static VerticalBlur vblur;
-	private static HorizontalBlur hblur2;
-    private static VerticalBlur vblur2;
+	private static CombineFilter combineFilter;
+
 	
 	public static void init(Loader loader){
 		quad = loader.loadToVAO(POSITIONS, 2);
 		contrastChanger = new ContrastChanger();
-		hblur = new HorizontalBlur(Display.getWidth()/8,Display.getHeight()/8);
-		vblur = new VerticalBlur(Display.getWidth()/8,Display.getHeight()/8);
-		hblur2 = new HorizontalBlur(Display.getWidth()/2,Display.getHeight()/2);
-        vblur2 = new VerticalBlur(Display.getWidth()/2,Display.getHeight()/2);
+		brightFilter = new BrightFilter(Display.getHeight()/2, Display.getHeight()/2);
+		hblur = new HorizontalBlur(Display.getWidth()/5,Display.getHeight()/5);
+		vblur = new VerticalBlur(Display.getWidth()/5,Display.getHeight()/5);
+		combineFilter = new CombineFilter();
 	}
 	
-	public static void doPostProcessing(int colourTexture){
+	public static void doPostProcessing(int colourTexture, int brightTexture){
 		start();
-		//hblur.render(vblur2.getOutputTexture());
-		//vblur.render(hblur.getOutputTexture());
-		contrastChanger.render(colourTexture);
+		//brightFilter.render(colourTexture);
+		hblur.render(brightTexture);
+		vblur.render(hblur.getOutputTexture());
+		combineFilter.render(colourTexture, vblur.getOutputTexture());
 		end();
 	}
 	
 	public static void cleanUp(){
 	    contrastChanger.cleanUp();
+	    brightFilter.cleanUp();
 	    hblur.cleanUp();
 	    vblur.cleanUp();
-	    hblur2.cleanUp();
-        vblur2.cleanUp();
+	    combineFilter.cleanUp();
 	}
 	
 	private static void start(){

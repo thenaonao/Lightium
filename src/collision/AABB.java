@@ -9,6 +9,7 @@ public class AABB
 
     public AABB(Vector3f_ minExtends, Vector3f_ maxExtends)
     {
+
         this.minExtends = minExtends;
         this.maxExtends = maxExtends;
     }
